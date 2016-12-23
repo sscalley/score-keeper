@@ -1,0 +1,28 @@
+.row {
+	max-width: 				none !important;
+}
+
+.userDetails {
+	width:					100%;
+	border-style:			solid;
+	border-width: 			.2em;
+	margin-bottom: 			.5em;
+}
+
+.userHeader {
+	background-color:		steelblue;
+	color:					white;
+}
+
+.name {
+	font-size:				2em;
+}
+
+.gameDetails {
+	font-size:				1em;
+}
+
+.reveal {
+	padding:				0em !important;
+	border:					none !important;
+}

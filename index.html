@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="css/score-keeper.css" />
+		<link rel="stylesheet" href="bower_components/foundation-sites/dist/foundation.min.css" />
+		<script src="bower_components/angular/angular.min.js"></script>
+	</head>
+	
+	<body ng-app="scoreKeeperApp" ng-controller="gameController">
+		<div class="title-bar" data-responsive-toggle="score-keeper-menu" data-hide-for="large">
+  			<button class="menu-icon" type="button" data-toggle></button>
+  			<div class="title-bar-title">Menu</div>
+		</div>
+
+		<div class="top-bar" id="score-keeper-menu">
+			<div class="top-bar-left">
+				<ul class="vertical large-horizontal menu" data-responsive-menu="drilldown large-dropdown">
+					<li class="menu-text">Score Keeper 5000</li>
+					<li><a href="#" onclick="showGameOptionsDiv()">Game Options</a></li>
+					<li><a href="#" ng-click="startNewGame()">Start New Game</a></li>
+					<li><a href="#" onclick="showPlayerOptionsDiv()">Player Options</a></li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- Page Content -->
+		<div>
+			<br/>
+
+			<!-- Player Options Callout -->
+			<div class="row columns">
+				<div id="playerOptionsDiv" class="callout secondary" data-closable>
+					<div class="row columns">
+						<h2>Player Options</h2>
+					</div>
+
+					<div class="row">
+						<div class="small-6 columns">
+							<input type="text" ng-model="newPlayerName" placeholder="New Player Name" />
+						</div>
+						<div class="small-6 columns">
+							<input ng-click="addNewPlayer()" type="button" value="Create Player"  class="button" />
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="small-6 columns">
+							<select ng-model="selectedToRemove" ng-options="x.name for x in players"></select>
+						</div>
+						<div class="small-6 columns">
+							<input ng-click="removePlayer()" type="button" value="Remove Player" class="button" />
+						</div>
+					</div>
+
+					<button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+			</div>
+
+			<!-- Game Options Callout -->
+			<div class="row columns">
+				<div id="gameOptionsDiv" class="callout secondary" data-closable>
+					<div class="row columns">
+						<h2>Game Options</h2>
+					</div>
+
+					<div class="row">
+						<div class="small-6 columns">
+							<select ng-model="selectedWinner" ng-options="x.name for x in players"></select>
+						</div>
+						<div class="small-6 columns">
+							<input ng-click="selectWinner()" type="button" value="Declare Winner"  class="button" />
+						</div>
+					</div>
+
+					<div class="row columns">
+						<input ng-click="startNewGame()" type="button" value="Start New Game"  class="button" />
+					</div>
+
+					<button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+			</div>
+
+			<!-- Calculate Round Modal -->
+			<div class="reveal" id="calculatorModal" data-reveal>
+				<div class="userHeader row">
+					<div class="columns">
+						<div class="name float-left">{{ calculator.name }}</div>
+						<div class="gameDetails float-right">Calculator Score {{ calculator.score }}</div>
+					</div>
+				</div>
+
+				<br/>
+
+				<table ng-show="calculator.roundDetails.length">
+					<thead>
+						<tr>
+							<th>Round</th>
+							<th>Score</th>
+							<th>Total</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="x in calculator.roundDetails">
+							<td>{{$index + 1}}</td>
+							<td>{{ x.roundOperator + " " + x.roundScore }}</td>
+							<td>{{ x.gameScore }}</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<div class="row">
+					<div class="small-6 columns">
+						<input name="calculatorRoundScore" type="number" ng-model="calculatorRoundScore" placeholder="Round Score" />
+					</div>
+					<div class="small-6 columns button-group">
+						<input ng-click="addToCalculator()" type="button" value="+" class="button" />
+						<input ng-click="subtractFromCalculator()" type="button" value="-" class="button" />
+						<input ng-click="multiplyCalculator()" type="button" value="x" class="button" />
+						<input ng-click="divideCalculator()" type="button" value="/" class="button" />
+					</div>
+				</div>
+
+				<div class="row columns">
+					<input ng-click="saveCalculator()" data-close type="button" value="Save Round" class="button" />
+					<input ng-click="resetCalculatorToZero()" data-close type="button" value="Reset Calculator To 0" class="button" />
+					<input ng-click="resetScoreToZero(calculator.playerIndex)" data-close type="button" value="Reset Score To 0" class="button" />
+				</div>
+				
+				<button class="close-button" data-close aria-label="Close modal" type="button">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			
+			<!-- User Scores Area -->
+			<div class="row columns">
+				<div ng-repeat="x in players" class="medium-6 large-3 columns end">
+					<div class="userDetails row">
+						<div class="columns">
+							<div class="userHeader row">
+								<div class="columns">
+									<div class="name float-left">{{ x.name }}</div>
+									<div class="gameDetails float-right">Score {{x.score}}</div>
+									<br/>
+									<div class="gameDetails float-right">Victories {{x.wins}}</div>
+								</div>
+							</div>
+
+							<br/>
+
+							<table ng-show="x.roundDetails.length">
+								<thead>
+									<tr>
+										<th>Round</th>
+										<th>Score</th>
+										<th>Total</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="y in x.roundDetails">
+										<td>{{$index + 1}}</td>
+										<td>{{ y.roundOperator + " " + y.roundScore }}</td>
+										<td>{{ y.gameScore }}</td>
+									</tr>
+								</tbody>
+							</table>
+
+							<div class="row">
+								<div class="small-6 columns">
+									<input name="userRoundScore" type="number" ng-model="roundScores[$index]" placeholder="Round Score" />
+								</div>
+								<div class="small-6 columns button-group">
+									<input ng-click="addToGame($index)" type="button" value="+" class="button" />
+									<input ng-click="subtractFromGame($index)" type="button" value="-" class="button" />
+									<input ng-click="multiplyGame($index)" type="button" value="x" class="button" />
+									<input ng-click="divideGame($index)" type="button" value="/" class="button" />
+								</div>
+							</div>
+
+							<div class="row columns">
+								<input ng-click="resetScoreToZero($index)" type="button" value="Reset Score To 0" class="button" />
+								<input ng-click="calculateRound($index)" data-open="calculatorModal" type="button" value="Calculate Round" class="button" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+				
+			<br/>
+
+			<score-keeper-footer></score-keeper-footer>
+		</div>
+		
+		<script src="bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="bower_components/what-input/what-input.min.js"></script>
+		<script src="bower_components/foundation-sites/dist/foundation.min.js"></script>
+		<script>
+		  $(document).foundation();
+		</script>
+		
+		<script src="scripts/playerFunctions.js"></script>
+		<script src="scripts/displayFunctions.js"></script>
+		<script src="scripts/angular/gameController.js"></script>
+		<script src="scripts/angular/scoreKeeperFooterDirective.js"></script>
+	</body>
+</html>
